@@ -2,6 +2,7 @@ import collections
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import datetime
 import pandas
+import pprint
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
@@ -33,17 +34,21 @@ categories = collections.defaultdict(list)
 for wine_data in wine_list:
     value = (wine_data['Категория'])
     categories[value].append(wine_data)
-
-
-rendered_page = template.render(
-    data=categories,
-    age=name_year(),
-)
-
-
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
-
-
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+# print(type(categories))
+# print(categories)
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(categories)
+#
+#
+# rendered_page = template.render(
+#     data=categories,
+#     age=name_year(),
+# )
+#
+#
+# with open('index.html', 'w', encoding="utf8") as file:
+#     file.write(rendered_page)
+#
+#
+# server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+# server.serve_forever()
