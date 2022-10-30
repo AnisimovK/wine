@@ -9,12 +9,11 @@ import argparse
 
 
 def designate_age():
-    born_date = 1920
+    born_date = 1921
     company_age = dt.date.today().year - born_date
-    if (company_age % 10 == 1) and (company_age != 11) \
-            and (company_age != 111):
+    if company_age % 10 == 1 and company_age != [11, 111]:
         return f'{company_age} год'
-    elif (company_age % 10 > 1) and (company_age % 10 < 5)\
+    elif 1 < company_age % 10 < 5 \
             and company_age not in [12, 13, 14]:
         return f'{company_age} года'
     else:
