@@ -8,29 +8,21 @@ import os
 import argparse
 
 
-load_dotenv()
-parser = argparse.ArgumentParser(
-    description='Сайт о вине',
-)
-parser.add_argument('path_to_wine',nargs='?', default=os.environ['path_to_wine'], help='В качестве аргумента введите '
-                                                                                       'путь до файла с таблицей. В '
-                                                                                       'противном случае путь будет '
-                                                                                       'установлен по умолчанию.')
-args = parser.parse_args()
-
-
 def designate_age():
-    company_age = dt.date.today().year - 1920
-    if (company_age % 10 == 1) and (company_age != 11) and (company_age != 111):
+    born_date = 1920
+    company_age = dt.date.today().year - born_date
+    if (company_age % 10 == 1) and (company_age != 11) \
+            and (company_age != 111):
         return f'{company_age} год'
-    elif (company_age % 10 > 1) and (company_age % 10 < 5) and (company_age != 12) and (company_age != 13) and (company_age != 14):
+    elif (company_age % 10 > 1) and (company_age % 10 < 5)\
+            and company_age not in [12, 13, 14]:
         return f'{company_age} года'
     else:
         return f'{company_age} лет'
 
 
-def reorganize_wine_file():
-    excel_data_df = pandas.read_excel(args.path_to_wine, na_filter=False)
+def reorganize_wine_file(path_to_wine):
+    excel_data_df = pandas.read_excel(path_to_wine, na_filter=False)
     wines = excel_data_df.to_dict(orient='records')
     wine_table = collections.defaultdict(list)
     for wine in wines:
@@ -39,7 +31,7 @@ def reorganize_wine_file():
     return wine_table
 
 
-def make_template():
+def make_template(path_to_wine):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
@@ -47,7 +39,7 @@ def make_template():
 
     template = env.get_template('template.html')
     rendered_page = template.render(
-        wine_table=reorganize_wine_file(),
+        wine_table=reorganize_wine_file(path_to_wine),
         age=designate_age(),
     )
 
@@ -56,7 +48,20 @@ def make_template():
 
 
 def main():
-    make_template()
+    load_dotenv()
+    parser = argparse.ArgumentParser(
+        description='Сайт о вине',
+    )
+    parser.add_argument('path_to_wine',
+                        nargs='?',
+                        default=os.environ['path_to_wine'],
+                        help='В качестве аргумента введите '
+                             'путь до файла с таблицей.'
+                             'Впротивном случае путь будет'
+                             'установлен по умолчанию.')
+
+    path_to_wine = parser.parse_args().path_to_wine
+    make_template(path_to_wine)
     server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
     server.serve_forever()
 
